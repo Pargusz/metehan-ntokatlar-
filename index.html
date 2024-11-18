@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metehan'ın Tokat Geri Sayımı</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        #countdown {
+            font-size: 2rem;
+            color: #ff0000;
+            margin-bottom: 20px;
+        }
+        #remaining {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            font-size: 1rem;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .increase {
+            background-color: #4caf50;
+            color: white;
+        }
+        .decrease {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Metehan'ın Tokat Geri Sayımı</h1>
+    <div id="countdown">00:00:00</div>
+    <div id="remaining">Kalan Tokat Sayısı: 4</div>
+    <div class="button-container">
+        <button class="increase" onclick="updateTokatCount(1)">Tokat Sayısını Arttır</button>
+        <button class="decrease" onclick="updateTokatCount(-1)">Tokat Sayısını Azalt</button>
+    </div>
+
+    <script>
+        // Yılbaşına kadar olan hedef zamanı hesapla
+        const getNewYearTime = () => {
+            const now = new Date();
+            return new Date(now.getFullYear() + 1, 0, 1).getTime();
+        };
+
+        // Tarayıcıda hedef zamanı kontrol et
+        let targetTime = localStorage.getItem("targetTime");
+        if (!targetTime) {
+            targetTime = getNewYearTime();
+            localStorage.setItem("targetTime", targetTime);
+        } else {
+            targetTime = parseInt(targetTime, 10); // Stringi sayıya çevir
+        }
+
+        // Geri sayımı güncelle
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const diff = targetTime - now;
+
+            if (diff > 0) {
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                const seconds = Math.floor((diff / 1000) % 60);
+
+                document.getElementById("countdown").textContent =
+                    `${days} Gün ${hours} Saat ${minutes} Dakika ${seconds} Saniye`;
+            } else {
+                document.getElementById("countdown").textContent = "Tokat Vakti Geldi!";
+                localStorage.removeItem("targetTime"); // Hedefe ulaşıldıysa temizle
+            }
+        }
+
+        // Tokat sayısını al ve kaydet
+        let tokatCount = localStorage.getItem("tokatCount");
+        tokatCount = tokatCount ? parseInt(tokatCount, 10) : 4; // Varsayılan değer 4
+        document.getElementById("remaining").textContent = `Kalan Tokat Sayısı: ${tokatCount}`;
+
+        function updateTokatCount(amount) {
+            tokatCount += amount;
+            if (tokatCount < 0) tokatCount = 0; // Negatif olmaması için
+            document.getElementById("remaining").textContent = `Kalan Tokat Sayısı: ${tokatCount}`;
+            localStorage.setItem("tokatCount", tokatCount); // Güncel değeri kaydet
+        }
+
+        // Geri sayımı her saniye güncelle
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+</body>
+</html>
